@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -17,7 +18,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
@@ -35,13 +38,13 @@ data class Vehicle(
     val model: String,
     val price: Double,
     val hp: Int,
-    val imageRes: ImageVector // Sustituiremos por imagenes
+    val imageRes: Int // Sustituiremos por imagenes
 )
 
 val vehicleList = listOf(
-    Vehicle(1, "Toyota", "Corolla", 25000.0, 140, Icons.Default.ShoppingCart),
-    Vehicle(2, "Ford", "Mustang", 55000.0, 450, Icons.Default.Warning),
-    Vehicle(3, "Tesla", "Model 3", 45000.0, 300, Icons.Default.ShoppingCart)
+    Vehicle(1, "Toyota", "Corolla", 25000.0, 140, R.drawable.corolla),
+    Vehicle(2, "Ford", "Mustang", 55000.0, 450, R.drawable.mustang),
+    Vehicle(3, "Tesla", "Model 3", 45000.0, 300, R.drawable.model3)
 )
 
 // VIEWMODEL (Para gestión del estado del carrito)
@@ -238,10 +241,14 @@ fun DetailsScreen(navController: NavController, vehicleId: Int, viewModel: ShopV
         Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
             Text("Detalles del Vehículo", style = MaterialTheme.typography.headlineMedium)
 
-            Icon(
-                imageVector = vehicle.imageRes,
-                contentDescription = "Imagen Coche",
-                modifier = Modifier.size(100.dp).align(Alignment.CenterHorizontally)
+            Image(
+                painter = painterResource(id = vehicle.imageRes),
+                contentDescription = "Imagen del ${vehicle.model}",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .align(Alignment.CenterHorizontally),
+                contentScale = ContentScale.Fit
             )
 
             //Características
