@@ -11,13 +11,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -175,57 +173,79 @@ fun WelcomeScreen(navController: NavController) {
 }
 
 //INICIO (HOME)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavController) {
     var NombreVehiculoSeleccionado by remember { mutableStateOf("Ninguno seleccionado") }
     var VehiculoSeleccionado by remember { mutableStateOf<Int?>(null) }
 
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-        Text("Catálogo de Vehículos", style = MaterialTheme.typography.headlineSmall)
-        Text("Seleccionado: $NombreVehiculoSeleccionado") //Indica el item seleccionado
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Lista de items
-        LazyColumn(modifier = Modifier.weight(1f)) {
-            items(vehicleList) { vehicle ->
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)
-                        .clickable {
-                            NombreVehiculoSeleccionado = "${vehicle.brand} ${vehicle.model}"
-                            VehiculoSeleccionado = vehicle.id
-                        },
-                    elevation = CardDefaults.cardElevation(4.dp)
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text(text = "${vehicle.brand} ${vehicle.model}", style = MaterialTheme.typography.titleMedium)
-                        Text(text = "ID: ${vehicle.id} - Precio: $${vehicle.price}")
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("JoOS") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowBack,
+                            contentDescription = "Volver atrás"
+                        )
                     }
                 }
-            }
+            )
         }
 
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            //Botón vuelta atrás
-            Button(onClick = {
-                //eliminamos destino actual
-                navController.popBackStack()
-            }) {
-                Text("Atrás")
-            }
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+            .fillMaxSize()
+            .padding(innerPadding)
+            .padding(16.dp)
+        ) {
+            Text("Catálogo de Vehículos", style = MaterialTheme.typography.headlineSmall)
+            Text("Seleccionado: $NombreVehiculoSeleccionado") //Indica el item seleccionado
 
-            Button(
-                enabled = VehiculoSeleccionado != null,
-                onClick = {
-                    VehiculoSeleccionado?.let { id ->
-                        //Le pasamos el coche seleccionado
-                        navController.navigate("details/$id")
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Lista de items
+            LazyColumn(modifier = Modifier.weight(1f)) {
+                items(vehicleList) { vehicle ->
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                            .clickable {
+                                NombreVehiculoSeleccionado = "${vehicle.brand} ${vehicle.model}"
+                                VehiculoSeleccionado = vehicle.id
+                            },
+                        elevation = CardDefaults.cardElevation(4.dp)
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text(
+                                text = "${vehicle.brand} ${vehicle.model}",
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                            Text(text = "ID: ${vehicle.id} - Precio: $${vehicle.price}")
+                        }
                     }
                 }
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("Confirmar / Detalles")
+                Button(
+                    enabled = VehiculoSeleccionado != null,
+                    onClick = {
+                        VehiculoSeleccionado?.let { id ->
+                            //Le pasamos el coche seleccionado
+                            navController.navigate("details/$id")
+                        }
+                    }
+                ) {
+                    Text("Confirmar / Detalles")
+                }
             }
         }
     }
@@ -238,93 +258,106 @@ fun DetailsScreen(navController: NavController, vehicleId: Int, viewModel: ShopV
     // Buscamos el vehículo por ID
     val vehicle = vehicleList.find { it.id == vehicleId }
 
-
-    val options = listOf("1","2","3")
+    val options = listOf("1", "2", "3")
     var expanded by remember { mutableStateOf(false) }
     var selectedQuantity by remember { mutableStateOf(options[0]) }
 
-    var quantityInput by remember { mutableStateOf("1") }
-
-    if (vehicle != null) {
-        Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-            Text("Detalles del Vehículo", style = MaterialTheme.typography.headlineMedium)
-
-            Image(
-                painter = painterResource(id = vehicle.imageRes),
-                contentDescription = "Imagen del ${vehicle.model}",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-                    .align(Alignment.CenterHorizontally),
-                contentScale = ContentScale.Fit
-            )
-
-            //Características
-            Text("Marca: ${vehicle.brand}")
-            Text("Modelo: ${vehicle.model}")
-            Text("Potencia: ${vehicle.hp} CV")
-            Text("Precio Unidad: $${vehicle.price}")
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text("Selecciona la cantidad:", style = MaterialTheme.typography.bodyMedium)
-
-            //Desplegable
-            ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange = { expanded = !expanded }
-            ) {
-                OutlinedTextField(
-                    value = selectedQuantity,
-                    onValueChange = {},
-                    readOnly = true,
-                    label = {Text("Cantidad")},
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-                    },
-                    modifier = Modifier
-                        .menuAnchor()
-                        .fillMaxWidth()
-                )
-                ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }//Se cierra al pulsar fuera
-                ) {
-                    options.forEach { selectionOption ->
-                        DropdownMenuItem(
-                            text = { Text(selectionOption) },
-                            onClick = {
-                                selectedQuantity = selectionOption
-                                expanded = false //cierra menu
-                            }
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("JoOS") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowBack,
+                            contentDescription = "Volver atrás"
                         )
                     }
                 }
+            )
+        }
+    ) { innerPadding ->
+        if (vehicle != null) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .padding(16.dp)
+            ) {
+                Text("Detalles del Vehículo", style = MaterialTheme.typography.headlineMedium)
 
+                Image(
+                    painter = painterResource(id = vehicle.imageRes),
+                    contentDescription = "Imagen del ${vehicle.model}",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .align(Alignment.CenterHorizontally),
+                    contentScale = ContentScale.Fit
+                )
 
+                Text("Marca: ${vehicle.brand}")
+                Text("Modelo: ${vehicle.model}")
+                Text("Potencia: ${vehicle.hp} CV")
+                Text("Precio Unidad: $${vehicle.price}")
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text("Selecciona la cantidad:", style = MaterialTheme.typography.bodyMedium)
+
+                ExposedDropdownMenuBox(
+                    expanded = expanded,
+                    onExpandedChange = { expanded = !expanded }
+                ) {
+                    OutlinedTextField(
+                        value = selectedQuantity,
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Cantidad") },
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                        },
+                        modifier = Modifier
+                            .menuAnchor()
+                            .fillMaxWidth()
+                    )
+                    ExposedDropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        options.forEach { selectionOption ->
+                            DropdownMenuItem(
+                                text = { Text(selectionOption) },
+                                onClick = {
+                                    selectedQuantity = selectionOption
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    //Comprar lleva a carrito
+                    Button(onClick = {
+                        val qty = selectedQuantity.toInt()
+                        viewModel.addToCart(vehicle, qty)
+                        navController.navigate("cart")
+                    }) {
+                        Text("Comprar")
+                    }
+                }
             }
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-                // Botón vuelta atrás
-                Button(onClick = { navController.popBackStack() }) {
-                    Text("Atrás")
-                }
-
-                //Comprar lleva a carrito
-                Button(onClick = {
-                    val qty = selectedQuantity.toInt()
-                    // Guardamos en ViewModel antes de navegar
-                    viewModel.addToCart(vehicle, qty)
-                    navController.navigate("cart")
-                }) {
-                    Text("Comprar")
-                }
+        } else {
+            Box(modifier = Modifier.padding(innerPadding)) {
+                Text("Vehículo no encontrado")
             }
         }
-    } else {
-        Text("Vehículo no encontrado")
     }
 }
 
