@@ -231,10 +231,17 @@ fun HomeScreen(navController: NavController) {
 }
 
 //DETALLES
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailsScreen(navController: NavController, vehicleId: Int, viewModel: ShopViewModel) {
     // Buscamos el vehículo por ID
     val vehicle = vehicleList.find { it.id == vehicleId }
+
+
+    val options = listOf("1","2","3")
+    var expanded by remember { mutableStateOf(false) }
+    var selectedQuantity by remember { mutableStateOf(options[0]) }
+
     var quantityInput by remember { mutableStateOf("1") }
 
     if (vehicle != null) {
@@ -259,13 +266,42 @@ fun DetailsScreen(navController: NavController, vehicleId: Int, viewModel: ShopV
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            //Indicador cantitdad a comprar
-            OutlinedTextField(
-                value = quantityInput,
-                onValueChange = { quantityInput = it },
-                label = { Text("Cantidad a comprar") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-            )
+            Text("Selecciona la cantidad:", style = MaterialTheme.typography.bodyMedium)
+
+            //Desplegable
+            ExposedDropdownMenuBox(
+                expanded = expanded,
+                onExpandedChange = { expanded = !expanded }
+            ) {
+                OutlinedTextField(
+                    value = selectedQuantity,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = {Text("Cantidad")},
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                    },
+                    modifier = Modifier
+                        .menuAnchor()
+                        .fillMaxWidth()
+                )
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }//Se cierra al pulsar fuera
+                ) {
+                    options.forEach { selectionOption ->
+                        DropdownMenuItem(
+                            text = { Text(selectionOption) },
+                            onClick = {
+                                selectedQuantity = selectionOption
+                                expanded = false //cierra menu
+                            }
+                        )
+                    }
+                }
+
+
+            }
 
             Spacer(modifier = Modifier.weight(1f))
 
@@ -277,7 +313,7 @@ fun DetailsScreen(navController: NavController, vehicleId: Int, viewModel: ShopV
 
                 //Comprar lleva a carrito
                 Button(onClick = {
-                    val qty = quantityInput.toIntOrNull() ?: 1
+                    val qty = selectedQuantity.toInt()
                     // Guardamos en ViewModel antes de navegar
                     viewModel.addToCart(vehicle, qty)
                     navController.navigate("cart")
