@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -31,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -52,7 +55,7 @@ fun DetailsScreen(navController: NavController, vehicleId: Int, viewModel: ShopV
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("JoOS") },
+                title = { Text("CompramosTuCoche.joos") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
@@ -79,6 +82,7 @@ fun DetailsScreen(navController: NavController, vehicleId: Int, viewModel: ShopV
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(200.dp)
+                        .clip(RoundedCornerShape(8.dp)) // bordes
                         .align(Alignment.CenterHorizontally),
                     contentScale = ContentScale.Fit
                 )

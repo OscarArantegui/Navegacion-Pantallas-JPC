@@ -32,7 +32,7 @@ fun LawInfoScreen(navController: NavController) {
             //volver
             navController.popBackStack()
         }) {
-            Text("Volver a Bienvenida")
+            Text("Volver")
         }
     }
 }

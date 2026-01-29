@@ -42,6 +42,7 @@ class MainActivity : ComponentActivity() {
                         HomeScreen(navController)
                     }
 
+                    //Pasar datos entre pantallas
                     composable(
                         route = "details/{vehicleId}",
                         arguments = listOf(navArgument("vehicleId") { type = NavType.IntType }) // - Uso de NavType.IntType (Línea 348)
