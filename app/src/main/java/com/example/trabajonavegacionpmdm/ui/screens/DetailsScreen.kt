@@ -36,8 +36,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.trabajonavegacionpmdm.R
 import com.example.trabajonavegacionpmdm.data.vehicleList
 import com.example.trabajonavegacionpmdm.ui.viewmodel.ShopViewModel
 
@@ -55,7 +57,7 @@ fun DetailsScreen(navController: NavController, vehicleId: Int, viewModel: ShopV
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("CompramosTuCoche.joos") },
+                title = { Text(text= stringResource(R.string.app_name)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(

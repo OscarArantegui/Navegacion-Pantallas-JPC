@@ -34,8 +34,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.trabajonavegacionpmdm.R
 import java.time.Instant
 import java.time.LocalDate
 import java.time.Period
@@ -57,11 +60,11 @@ fun WelcomeScreen(navController: NavController) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text ( "CompramosTuCoche.joos" ) },
+                title = { Text (text= stringResource(R.string.app_name)) },
                 navigationIcon = {
                     Icon(
-                        imageVector = Icons.Filled.Favorite,
-                        contentDescription = "Icono de corazón"
+                        painter = painterResource(R.drawable.car_shopping),
+                        contentDescription = "Icono de coche"
                     )
                 }
 
