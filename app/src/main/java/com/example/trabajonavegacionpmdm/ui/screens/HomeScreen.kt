@@ -45,6 +45,7 @@ import androidx.navigation.NavController
 import com.example.trabajonavegacionpmdm.R
 import com.example.trabajonavegacionpmdm.data.Vehicle
 import com.example.trabajonavegacionpmdm.data.vehicleList
+import com.example.trabajonavegacionpmdm.ui.components.SearchBar
 
 
 //INICIO (HOME)
@@ -54,6 +55,13 @@ fun HomeScreen(navController: NavController) {
     var NombreVehiculoSeleccionado by remember { mutableStateOf("Ninguno seleccionado") }
     var VehiculoSeleccionado by remember { mutableStateOf<Int?>(null) }
 
+    //Estado para la búsqueda
+    var searchQuery by remember { mutableStateOf("")}
+    //Logica de filtrado
+    val filteredVehicles = vehicleList.filter { vehicle ->
+        vehicle.brand.contains(searchQuery, ignoreCase = true) ||
+        vehicle.model.contains(searchQuery, ignoreCase = true)
+    }
 
     Scaffold(
         topBar = {
@@ -80,11 +88,19 @@ fun HomeScreen(navController: NavController) {
             Text("Catálogo de Vehículos", style = MaterialTheme.typography.headlineSmall)
             Text("Seleccionado: $NombreVehiculoSeleccionado") //Indica el item seleccionado
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
+
+            //Mostramos barra de busqueda
+            SearchBar(
+                query = searchQuery,
+                onQueryChange = { newQuery -> searchQuery = newQuery }
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Lista de items
             LazyColumn(modifier = Modifier.weight(1f)) {
-                items(vehicleList) { vehicle ->
+                items(filteredVehicles) { vehicle ->
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
