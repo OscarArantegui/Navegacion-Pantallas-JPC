@@ -28,6 +28,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,22 +44,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.trabajonavegacionpmdm.R
-import com.example.trabajonavegacionpmdm.data.Vehicle
-import com.example.trabajonavegacionpmdm.data.vehicleList
 import com.example.trabajonavegacionpmdm.ui.components.SearchBar
+import com.example.trabajonavegacionpmdm.ui.viewmodel.ShopViewModel
 
 
 //INICIO (HOME)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(navController: NavController) {
+fun HomeScreen(navController: NavController, viewModel: ShopViewModel) {
     var NombreVehiculoSeleccionado by remember { mutableStateOf("Ninguno seleccionado") }
     var VehiculoSeleccionado by remember { mutableStateOf<Int?>(null) }
+    var searchQuery by remember { mutableStateOf("") }
 
-    //Estado para la búsqueda
-    var searchQuery by remember { mutableStateOf("")}
-    //Logica de filtrado
-    val filteredVehicles = vehicleList.filter { vehicle ->
+    val vehiclesList by viewModel.vehicles.collectAsState()
+
+    val filteredVehicles = vehiclesList.filter { vehicle ->
         vehicle.brand.contains(searchQuery, ignoreCase = true) ||
         vehicle.model.contains(searchQuery, ignoreCase = true)
     }

@@ -1,12 +1,11 @@
 package com.example.trabajonavegacionpmdm
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -19,8 +18,15 @@ import com.example.trabajonavegacionpmdm.ui.viewmodel.ShopViewModel
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val shopViewModel: ShopViewModel by viewModels()
-
+        // Pasar el Context al ViewModel
+        val context = applicationContext
+        val shopViewModel: ShopViewModel by viewModels {
+            viewModelFactory {
+                initializer {
+                    ShopViewModel(context)
+                }
+            }
+        }
         setContent {
             //Inicializar NavController
             val navController = rememberNavController()
@@ -39,7 +45,7 @@ class MainActivity : ComponentActivity() {
                     }
 
                     composable("home") {
-                        HomeScreen(navController)
+                        HomeScreen(navController, shopViewModel)
                     }
 
                     //Pasar datos entre pantallas

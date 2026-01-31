@@ -40,7 +40,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.trabajonavegacionpmdm.R
-import com.example.trabajonavegacionpmdm.data.vehicleList
 import com.example.trabajonavegacionpmdm.ui.viewmodel.ShopViewModel
 
 //DETALLES
@@ -48,7 +47,7 @@ import com.example.trabajonavegacionpmdm.ui.viewmodel.ShopViewModel
 @Composable
 fun DetailsScreen(navController: NavController, vehicleId: Int, viewModel: ShopViewModel) {
     // Buscamos el vehículo por ID
-    val vehicle = vehicleList.find { it.id == vehicleId }
+    val vehicle = viewModel.getVehicleById(vehicleId)
 
     val options = listOf("1", "2", "3")
     var expanded by remember { mutableStateOf(false) }

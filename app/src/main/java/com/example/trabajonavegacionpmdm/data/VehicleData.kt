@@ -1,6 +1,11 @@
 package com.example.trabajonavegacionpmdm.data
 
+import android.content.Context
 import com.example.trabajonavegacionpmdm.R
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import java.io.IOException
+
 
 // SIMULACIÓN DE DATOS
 data class Vehicle(
@@ -12,9 +17,57 @@ data class Vehicle(
     val imageRes: Int // Sustituiremos por imagenes
 )
 
-val vehicleList = listOf(
-    Vehicle(1, "Toyota", "Corolla", 25000.0, 140, R.drawable.corolla),
-    Vehicle(2, "Ford", "Mustang", 55000.0, 450, R.drawable.mustang),
-    Vehicle(3, "Tesla", "Model 3", 45000.0, 300, R.drawable.model3),
-    Vehicle(4,"Porsche","911",100000.0,400,R.drawable.porsche)
+// Clase que lee el JSON ( por eso imageName es String )
+@Serializable
+data class VehicleJsonDto(
+    val id: Int,
+    val brand: String,
+    val model: String,
+    val price: Double,
+    val hp: Int,
+    val imageName: String
 )
+
+object VehicleProvider {
+
+    // Configuración para que sea tolerante a errores
+    private val jsonConfig = Json {
+        ignoreUnknownKeys = true
+        coerceInputValues = true
+    }
+
+    fun loadVehiclesFromJson(context: Context): List<Vehicle> {
+        val jsonString: String
+        try {
+            jsonString = context.assets.open("vehicles.json")
+                .bufferedReader()
+                .use { it.readText() }
+        } catch (ioException: IOException) {
+            ioException.printStackTrace()
+            return emptyList()
+        }
+
+        // Leemos el JSON
+        val dtoList = jsonConfig.decodeFromString<List<VehicleJsonDto>>(jsonString)
+
+        // Asignamos a cada coche su imagen
+        val imagenesMap = mapOf(
+            "corolla" to R.drawable.corolla,
+            "mustang" to R.drawable.mustang,
+            "model3" to R.drawable.model3,
+            "porsche" to R.drawable.porsche
+        )
+
+
+        return dtoList.map { dto ->
+            Vehicle(
+                id = dto.id,
+                brand = dto.brand,
+                model = dto.model,
+                price = dto.price,
+                hp = dto.hp,
+                imageRes = imagenesMap[dto.imageName] ?: R.drawable.ic_launcher_foreground
+            )
+        }
+    }
+}
